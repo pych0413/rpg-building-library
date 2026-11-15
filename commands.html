@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>建村指令速查</title>
+<style>
+ #build-gallery .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:14px}
+ #build-gallery .gallery-grid[hidden],#build-gallery .gallery-card[hidden]{display:none}
+ #build-gallery .gallery-card{min-width:0;overflow:hidden;padding:0}
+ #build-gallery .gallery-preview{display:block;aspect-ratio:16/9;overflow:hidden;background:#182426}
+ #build-gallery .gallery-preview img{display:block;width:100%;height:100%;object-fit:contain}
+ #build-gallery .gallery-info{padding:12px}
+ #build-gallery .gallery-info h3{margin:0 0 5px;font-size:1rem}
+ #build-gallery .gallery-info p{margin:0 0 8px;font-size:.85rem}
+ #build-gallery .gallery-command{width:100%;white-space:normal;overflow-wrap:anywhere;text-align:left}
+/* Layout: one reading column, sticky search + section chips on top, every command is a tap-to-copy chip beside a one-line note. */
+:root{
+  --bg:#f2f5f2; --surface:#ffffff; --ink:#1b2420; --muted:#5a6962; --line:#d6ddd8;
+  --accent:#1c7567; --accent-soft:#dcefeb; --code:#e8eeea;
+  --warn:#8a5200; --warn-bg:#fff2d2; --danger:#a1251c; --danger-bg:#fde3df; --ok:#2c6e2f;
+  --sans:"Microsoft JhengHei UI","Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif;
+  --mono:"Cascadia Mono","Consolas","SF Mono","Menlo",monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#131917; --surface:#1b2320; --ink:#e5ece8; --muted:#99a8a0; --line:#2d3833;
+    --accent:#62c7b6; --accent-soft:#1c3934; --code:#222c28;
+    --warn:#f1b85f; --warn-bg:#3a2d12; --danger:#ff8f85; --danger-bg:#3e1c19; --ok:#8fd492;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:112px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 var(--sans);-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+.wrap{max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px 8px}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.bar h1{font-size:18px;margin:0;letter-spacing:.02em;white-space:nowrap}
+.bar input{flex:1 1 220px;min-width:0;font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.bar input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.hits{font-size:13px;color:var(--muted);white-space:nowrap}
+nav.chips{display:flex;gap:6px;overflow-x:auto;padding-top:8px;scrollbar-width:thin}
+nav.chips a{flex:none;font-size:13px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 11px}
+nav.chips a:hover,nav.chips a:focus-visible{border-color:var(--accent);color:var(--accent)}
+main{padding-block:18px 60px;display:flex;flex-direction:column;gap:26px}
+section>h2{font-size:21px;margin:0 0 4px;text-wrap:balance}
+section>p.intro{margin:0 0 10px;color:var(--muted);max-width:68ch}
+.group{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px 4px;margin-top:12px}
+.group>h3{font-size:15px;margin:0 0 2px;color:var(--accent);letter-spacing:.04em}
+.group>p{margin:0 0 6px;font-size:13.5px;color:var(--muted)}
+.row{display:grid;grid-template-columns:minmax(0,330px) minmax(0,1fr);gap:4px 18px;padding:8px 0;border-top:1px solid var(--line);align-items:start}
+.group>.row:first-of-type{border-top:0}
+.c{font:13.5px/1.5 var(--mono);text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--code);color:var(--ink);border:1px solid transparent;border-radius:6px;padding:3px 8px;cursor:pointer;max-width:100%}
+.c:hover,.c:focus-visible{border-color:var(--accent);outline:none}
+.c.done{background:var(--accent-soft);border-color:var(--accent)}
+.d{font-size:14.5px}
+.tag{display:inline-block;font-size:11.5px;line-height:1.5;border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:1px;white-space:nowrap}
+.tag.u{background:var(--code);color:var(--muted);border:1px solid var(--line)}
+.tag.w{background:var(--warn-bg);color:var(--warn)}
+.tag.d{background:var(--danger-bg);color:var(--danger)}
+.note{border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;padding:9px 13px;margin:10px 0;font-size:14.5px}
+.note.w{border-color:var(--warn);background:var(--warn-bg)}
+.note.d{border-color:var(--danger);background:var(--danger-bg)}
+.note b{font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;margin-top:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.card h3{font-size:15.5px;margin:0 0 6px}
+.card ol,.card ul{margin:0;padding-left:20px}
+.card li{margin:5px 0;font-size:14.5px}
+.card li .c{margin:2px 0}
+.facts{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:6px 22px}
+.facts li{font-size:14.5px;padding:4px 0;border-top:1px solid var(--line)}
+.facts b{color:var(--accent)}
+.blocks{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;padding:6px 0 10px}
+.blk{display:flex;flex-direction:column;gap:1px;text-align:left;background:var(--code);border:1px solid transparent;border-radius:6px;padding:5px 9px;cursor:pointer;color:var(--ink);font:inherit;min-width:0}
+.blk b{font-size:14px;font-weight:600}
+.blk code{font:12.5px/1.4 var(--mono);color:var(--muted);overflow-wrap:anywhere}
+.blk:hover,.blk:focus-visible{border-color:var(--accent);outline:none}
+.blk.done{background:var(--accent-soft);border-color:var(--accent)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 10px 6px 0;border-top:1px solid var(--line);vertical-align:top}
+th{font-size:12.5px;color:var(--muted);font-weight:600;border-top:0;letter-spacing:.04em}
+td .c{font-size:13px}
+.yes{color:var(--ok);font-weight:700}.no{color:var(--danger);font-weight:700}
+#toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .15s;max-width:calc(100vw - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#toast.on{opacity:1}
+footer{color:var(--muted);font-size:13px;padding-bottom:40px}
+@media (max-width:640px){
+  html{scroll-padding-top:128px}
+  .row{grid-template-columns:minmax(0,1fr)}
+  .bar h1{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}#toast{transition:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<div class="bar">
+<h1>建村指令速查</h1>
+<input aria-label="搜尋" autocomplete="off" id="q" placeholder="搵指令或者方塊（例如：貼、paste、石磚、領地）" type="search"/>
+<span class="hits" id="hits"></span>
+</div>
+<nav aria-label="分類" class="chips" id="nav"></nav>
+</div></header>
+<div class="wrap"><main id="main">
+<section data-nav="開始" id="start">
+<h2>先睇呢度</h2>
+<p class="intro">撳任何一條指令就會複製，返去遊戲撳 T 再 Ctrl+V 貼上。全部內容都係對住呢個 RPG 服（Forge 1.20.1）實際查過嘅；標住「未實測」嘅係我未喺 server 上面親手試過。</p>
+<div class="group">
+<h3>呢個 server 而家嘅設定</h3>
+<ul class="facts">
+<li><b>WorldEdit</b>：已經裝咗，OP 先用得。選取棒係木鋤頭，導航棒係指南針。</li>
+<li><b>領地（Flan）</b>：只可以喺主世界圈。圈地工具係金鋤頭，查詢工具係木棍。</li>
+<li><b>邊個係領地管理員</b>：OP 2 級或以上，即係得你。OP 1 級嘅朋友喺領地入面同普通玩家一樣。</li>
+<li><b>世界出生點</b>：3488 78 6460（而家個主城）。</li>
+<li><b>主城保護</b>：已經有，範圍大約 x 3268–3690、z 6326–6613，高度 58 以上。</li>
+<li><b>主城唔生敵對怪</b>：已經有，連刷怪籠同 /summon 出嚟嘅敵對怪都會即刻消失。</li>
+<li><b>刷怪籠</b>：呢個 server 嘅刷怪籠啟動後大約 1 分鐘就會自毀，唔可以用嚟做長期固定生怪點。</li>
+<li><b>死亡唔跌嘢</b>（keepInventory）開咗；<b>火唔蔓延</b>（doFireTick）熄咗。</li>
+</ul>
+</div>
+<div class="cards">
+<div class="card">
+<h3>貼一座現成建築</h3>
+<ol>
+<li>將下載嘅 <code>.schem</code> 或者 <code>.schematic</code> 拖落桌面「RPG建築上傳」。新格式同新版本嘅檔會自動轉。</li>
+<li>視窗會話你知個名，同埋 server 識唔識晒啲方塊。</li>
+<li>入遊戲企喺想放嘅位置：<button class="c" type="button">//schem load 名</button></li>
+<li>要轉向就 <button class="c" type="button">//rotate 90</button></li>
+<li><button class="c" type="button">//paste -a</button></li>
+<li>位置唔啱：<button class="c" type="button">//undo</button>，行過啲再貼。</li>
+</ol>
+</div>
+<div class="card">
+<h3>整平一塊地</h3>
+<ol>
+<li>企喺一個角嘅地面：<button class="c" type="button">//pos1</button></li>
+<li>行去對角（同一高度）：<button class="c" type="button">//pos2</button></li>
+<li>移落地面嗰層：<button class="c" type="button">//shift 1 down</button></li>
+<li>鋪平：<button class="c" type="button">//set grass_block</button></li>
+<li>移返上去再向上擴：<button class="c" type="button">//shift 1 up</button> <button class="c" type="button">//expand 40 up</button></li>
+<li>清走上面嘅樹同山：<button class="c" type="button">//set air</button></li>
+</ol>
+</div>
+<div class="card">
+<h3>改之前先備份原地 <span class="tag u">未實測</span></h3>
+<ol>
+<li>揀住想保留嘅範圍（<button class="c" type="button">//wand</button> 點兩個角）。</li>
+<li><button class="c" type="button">//copy</button></li>
+<li><button class="c" type="button">//schem save bak_名</button></li>
+<li>之後想還原：<button class="c" type="button">//schem load bak_名</button> 再 <button class="c" type="button">//paste -o</button>（貼返原本座標）。</li>
+</ol>
+</div>
+<div class="card">
+<h3>保護新起嘅村 <span class="tag u">未實測</span></h3>
+<ol>
+<li>揸金鋤頭，右鍵點村嘅兩個對角。格數唔夠：<button class="c" type="button">/flan giveClaimBlocks R1suuu 30000</button></li>
+<li>企喺入面：<button class="c" type="button">/flan setAdminClaim true</button>（變管理員領地，唔佔格數，得你改得）。</li>
+<li><button class="c" type="button">/flan permission global flan:mob_spawn false</button>（唔生敵對怪）。</li>
+<li>管理員領地唔跟 server 嘅鎖定，門要自己開返：<button class="c" type="button">/flan permission global flan:door true</button> <button class="c" type="button">/flan permission global flan:trapdoor true</button> <button class="c" type="button">/flan permission global flan:fence_gate true</button></li>
+<li><button class="c" type="button">/flan menu</button> 設定訪客可以做咩。</li>
+<li><button class="c" type="button">/flan name 新手村</button></li>
+<li>搵個 OP 1 級嘅朋友試下打爛一格，應該打唔到。</li>
+</ol>
+</div>
+</div>
+</section>
+<section data-nav="保護現況" id="guard">
+<h2>主城而家點樣保護</h2>
+<p class="intro">現有主城唔係靠領地指令保護，而係靠 server 入面兩個設定。佢哋綁死座標，喺第二度起新村唔會自動有。</p>
+<div class="group">
+<h3>邊啲嘢已經生效</h3>
+<div class="tablewrap"><table>
+<tr><th>保護</th><th>範圍</th><th>效果</th></tr>
+<tr class="prow"><td>主城守衛（server 腳本）</td><td>x 3268–3690、z 6326–6613，高度 58 以上，六個長方形</td><td>「非建築者」唔可以打爛或者放方塊、用水桶同火、開裝飾用嘅箱、改告示牌、踩田。村民打唔死。爆炸取消。</td></tr>
+<tr class="prow"><td>禁生怪（In Control）</td><td>以 3480, 6470 為中心嘅主城一帶</td><td>敵對怪唔會自然生成；刷怪籠同 <code>/summon</code> 出嚟嘅敵對怪都會即刻消失。亡靈之塔例外。</td></tr>
+</table></div>
+<div class="note w"><b>同你想要嘅有一樣唔同：</b>而家「建築者」係指任何 OP（包括 1 級）同創造模式嘅人，所以你啲 OP 1 級朋友喺主城係起得、拆得嘅。想改成只有你（OP 4）先得，要改腳本，下次重啟先生效，同 Claude 講。</div>
+<div class="note"><b>喺第二個位置起新村：</b>你可以即刻用領地指令自己保護（睇「領地」一節）。想要同主城一樣徹底嘅保護（連刷怪籠同指令生嘅怪都擋），就將新村嘅座標範圍畀 Claude，加入呢兩個設定。</div>
+<div class="note"><b>主城嘅功能綁死座標：</b>金幣商店、兩個祭壇、傳送石、出生點都係。想搬去新村要搵 Claude 改。</div>
+</div>
+<div class="group">
+<h3>查詢指令</h3>
+<div class="row"><button class="c" type="button">/townguard status</button><div class="d">睇主城守衛有冇開、擋咗幾多次。</div></div>
+<div class="row"><button class="c" type="button">/townguard at 3488 78 6460</button><div class="d">睇某個座標喺唔喺保護範圍入面。</div></div>
+</div>
+</section>
+<section data-nav="建築圖庫" id="build-gallery"><h2>建築圖庫</h2><div class="group"><p class="note"><a href="index.html">開啟 RPG 建築圖庫</a>，可按分類睇預覽同複製載入指令。</p></div></section>
+</main>
+<footer>
+  資料來源：2026-11-11（UTC）由 RPG 服控制台實際讀出嘅 WorldEdit 7.2.15、Flan 1.11.16 指令說明，同 server 嘅設定檔。Server 設定改咗之後，呢頁要跟住更新。
+</footer>
+</div>
+<div aria-live="polite" id="toast" role="status"></div>
+<script>
+// item: [command, note, flags]  flags: u = not tested on this server, w = be careful, d = dangerous
+const SECTIONS = [
+{id:'we', nav:'WorldEdit', title:'WorldEdit：起樓工具', intro:'兩條斜線開頭嘅多數要先揀範圍。方向可以寫 up、down、north、south、east、west，唔寫就係你面向嗰邊。',
+ groups:[
+ {t:'揀範圍', p:'大部分指令都係對「兩個對角點定出嘅長方體」生效。', items:[
+  [`//wand`,`攞選取棒（呢個 server 係木鋤頭）。左鍵點方塊＝第 1 點，右鍵＝第 2 點。`],
+  [`//pos1`,`用你腳嗰格做第 1 點。企喺地面打，揀中嘅係地面對上嗰格。`],
+  [`//pos2`,`用你腳嗰格做第 2 點。`],
+  [`//hpos1`,`用你望住嗰格做第 1 點，遠距離好用。`],
+  [`//hpos2`,`用你望住嗰格做第 2 點。`],
+  [`//expand 10 up`,`範圍向上擴大 10 格。`],
+  [`//expand vert`,`範圍擴到由世界最底去到最高。`],
+  [`//contract 5`,`範圍縮細 5 格，可以指定方向。縮完打 //size 檢查。`],
+  [`//shift 5 north`,`將範圍本身移 5 格，方塊唔郁。`],
+  [`//outset 3`,`範圍每一面各擴大 3 格。加 -h 只擴橫向，-v 只擴上下。`],
+  [`//inset 3`,`範圍每一面各縮細 3 格。`],
+  [`//chunk`,`揀你身處嘅成個區塊（16×16）。`],
+  [`//size`,`睇範圍幾大、兩個角嘅座標。`],
+  [`//count stone`,`數範圍內有幾多個指定方塊。`],
+  [`//distr`,`列出範圍內每種方塊有幾多。`],
+  [`//desel`,`取消選取。`],
+  [`//drawsel`,`顯示或者隱藏選取框。據 WorldEdit 資料，要喺創造模式而且範圍唔大先顯示。`,'u'],
+ ]},
+ {t:'貼建築：剪貼簿同建築檔', p:'貼出嚟嘅位置，係相對於原作者複製時企嘅位置，所以第一次多數會偏。', items:[
+  [`//schem list`,`睇 server 有邊啲建築檔。加 -n 由新排到舊。`],
+  [`//schem load 名`,`將建築檔載入剪貼簿。`],
+  [`//paste -a`,`貼喺你企嘅位置，唔貼空氣：唔會挖走原本嘅地形同樹。最常用。`],
+  [`//paste`,`連空氣一齊貼：建築範圍內原本嘅嘢會被清走。`],
+  [`//paste -as`,`貼完順手揀住成座建築，方便之後再搬或者改。`],
+  [`//paste -n`,`唔貼，只揀出將會佔用嘅範圍。之後打 //size 睇座標，確認位置先真貼。`],
+  [`//paste -o`,`貼返去複製時嘅原本座標，還原備份用。`],
+  [`//paste -ae`,`連生物、畫、盔甲座一齊貼（建築檔入面有先有）。`],
+  [`//rotate 90`,`貼之前將剪貼簿轉 90 度。可以 90、180、270。`],
+  [`//flip`,`貼之前做鏡像反轉，方向係你面向嗰邊。//flip up 係上下反轉。`],
+  [`//copy`,`複製揀咗嘅範圍。你企嘅位置會記低做基準點。加 -e 連生物同裝飾一齊複製。`],
+  [`//cut`,`剪走揀咗嘅範圍，原位變空氣。`],
+  [`//schem save 名`,`將剪貼簿存成建築檔。加 -f 可以覆蓋同名檔。`],
+  [`/clearclipboard`,`清空剪貼簿。`],
+  [`//schem delete 名`,`永久刪除一個建築檔，冇得還原。想移走就搵 Claude 搬去備份。`,'d'],
+ ]},
+ {t:'改方塊', items:[
+  [`//set stone_bricks`,`將成個範圍變做指定方塊。//set air 即係清空。`],
+  [`//set 60%grass_block,40%coarse_dirt`,`按比例混合幾種方塊。`],
+  [`//replace dirt grass_block`,`範圍內將第一種方塊換做第二種。`],
+  [`//replace stone_bricks`,`只寫一個方塊：範圍內所有非空氣方塊都換做佢。`],
+  [`//walls cobblestone`,`只喺範圍四邊起牆，冇頂冇底。`],
+  [`//faces glass`,`起齊六面：四邊牆、頂、底。`],
+  [`//overlay gravel`,`喺範圍內每一格地面上面鋪一層。鋪路、鋪雪用。`],
+  [`//hollow`,`將實心嘅嘢挖空，剩一層外殼。`],
+  [`//center glowstone`,`喺範圍正中心放一格，搵中心點用。`],
+  [`//line stone_bricks`,`喺第 1 點同第 2 點之間拉一條直線。`],
+  [`//smooth 3 grass_block,dirt,stone`,`將範圍內嘅自然地面磨平滑，數字係次數。後面嗰串方塊係限制只磨地面；唔加嘅話，範圍內嘅建築都會當地形咁磨走。揀範圍時唔好包住建築。`,'w'],
+  [`//naturalize`,`將範圍變返自然地層：面頭 3 層泥，下面石頭。`],
+  [`//flora`,`喺範圍內嘅草地隨機種草同花。`],
+  [`//forest birch 5`,`喺範圍內種樹，後面係樹種同密度。`],
+  [`//regen`,`將範圍重新生成做原始地形。喺模組服好易出事，唔好用。`,'d'],
+ ]},
+ {t:'搬同重複', items:[
+  [`//move 5 north`,`將揀咗嘅嘢成舊搬 5 格。`],
+  [`//move -s 5 north`,`搬完，選取範圍跟住過去。`],
+  [`//move -a 5 up`,`搬嘅時候唔搬空氣，唔會用空氣蓋走目的地嘅方塊。`],
+  [`//stack 3 east`,`將揀咗嘅嘢向東重複 3 次。起圍牆、橋、一排屋好快。`],
+  [`//stack -a 3 east`,`重複時唔複製空氣。`],
+ ]},
+ {t:'造型', p:'喺你企嘅位置生成。', items:[
+  [`//cyl stone_bricks 5 3`,`實心圓柱：半徑 5、高 3。`],
+  [`//hcyl stone_bricks 5 10`,`空心圓柱，起塔身用。`],
+  [`//sphere glass 6`,`實心球。加 -r 令球底對齊你企嘅位置。`],
+  [`//hsphere glass 6`,`空心球。`],
+  [`//pyramid sandstone 8`,`實心金字塔，數字係層數。`],
+  [`//hpyramid sandstone 8`,`空心金字塔。`],
+  [`/forestgen 15 birch 5`,`喺你周圍 15 格種樹林，最後係密度。`],
+ ]},
+ {t:'筆刷同工具', p:'揸住一件物品打指令，之後用嗰件物品右鍵遠處就會生效。', items:[
+  [`/brush sphere stone 3`,`球形筆刷：右鍵邊度，就喺嗰度刷一個半徑 3 嘅球。堆山、補地形用。`],
+  [`/brush cylinder grass_block 4 1`,`圓餅筆刷：半徑 4、高 1。鋪地用。`],
+  [`/brush smooth 4`,`平滑筆刷：右鍵邊度就磨平邊度。`],
+  [`/brush gravity 5`,`重力筆刷：令懸空嘅方塊跌落地。`],
+  [`/brush clipboard -a`,`將剪貼簿變做印章，右鍵邊度就貼喺邊度。種樹、放石頭好快。`],
+  [`/mask grass_block`,`限制筆刷只影響指定方塊。淨係打 /mask 就係取消。`],
+  [`/size 5`,`改筆刷大細。`],
+  [`/range 50`,`改筆刷最遠有效距離。`],
+  [`/material stone`,`改筆刷用嘅方塊。`],
+  [`/tool repl stone_bricks`,`替換工具：右鍵一格就換做指定方塊。`],
+  [`/tool tree`,`種樹工具：右鍵草地就生一棵樹。`],
+  [`/tool farwand`,`遠距離選取棒：唔使行埋去都點到第 1、第 2 點。`],
+  [`/tool info`,`資料工具：右鍵方塊睇佢嘅 id 同狀態。`],
+  [`/none`,`解除手上物品綁定嘅筆刷或者工具。`],
+ ]},
+ {t:'還原', p:'還原紀錄只喺你今次上線期間有效。Server 重啟或者離線耐咗就冇，所以每貼一座就即刻檢查。', items:[
+  [`//undo`,`還原上一步。//undo 3 還原三步。`],
+  [`//redo`,`取消還原。`],
+  [`/clearhistory`,`清空還原紀錄。`],
+ ]},
+ {t:'移動', items:[
+  [`/up 20`,`升高 20 格，腳下放一塊玻璃畀你企。`],
+  [`/thru`,`穿過你面前嘅牆。`],
+  [`/ascend`,`上一層。`],
+  [`/descend`,`落一層。`],
+  [`/ceil`,`升到天花板底下。`],
+  [`/jumpto`,`飛去你望住嗰格。`],
+  [`/unstuck`,`卡住喺方塊入面時走甩。`],
+  [`//wand -n`,`攞導航棒（指南針）：左鍵飛去望住嗰格，右鍵穿牆。平時揸住指南針唔好亂撳。`],
+ ]},
+ {t:'清理', items:[
+  [`/removeabove 5 30`,`清走你頭頂對上嘅方塊：左右各 5 格、最高 30 格。`],
+  [`/removebelow 5 10`,`清走你腳下嘅方塊。`],
+  [`/removenear ##leaves 20`,`清走附近 20 格內所有指定方塊，呢個例子係樹葉。`],
+  [`/replacenear 15 dirt grass_block`,`附近 15 格內將一種方塊換做另一種。`],
+  [`//drain 15`,`抽走附近 15 格嘅水同熔岩。加 -w 連含水方塊都抽乾。`],
+  [`//fill dirt 8 3`,`填平你腳下附近嘅窿：半徑 8、深 3。`],
+  [`/fixwater 15`,`將附近流動緊嘅水變返靜水，整湖用。`],
+  [`/green 15`,`將附近泥土變做草方塊。`],
+  [`/snow 15`,`喺附近鋪雪。`],
+  [`/thaw 15`,`融走附近嘅雪同冰。`],
+  [`/extinguish 20`,`撲熄附近嘅火。`],
+  [`/remove items 30`,`清走附近 30 格嘅掉落物。items 可以換做 arrows、boats、minecarts、xp、paintings、itemframes。盔甲座唔包，要用 /butcher -r 30。`],
+  [`/butcher 30`,`殺死附近 30 格嘅敵對怪。預設唔殺村民、動物、寵物同有名牌嘅怪。加 -a 連動物、-n 連 NPC、-f 連所有友善生物都殺，喺村入面唔好加。`,'w'],
+ ]},
+ {t:'方塊點樣寫', p:'指令入面「方塊」嗰個位可以寫得好靈活。', items:[
+  [`stone_bricks`,`原版方塊直接寫 id。`],
+  [`modid:block_name`,`模組方塊要連埋模組名。`],
+  [`50%stone,50%cobblestone`,`按比例混合。`],
+  [`oak_stairs[facing=north,half=top]`,`指定方向同狀態。half=top 即係倒轉。`],
+  [`oak_log[axis=x]`,`木頭打橫放。axis 可以係 x、y、z。`],
+  [`oak_slab[type=top]`,`半磚放上半格。`],
+  [`##wool`,`隨機用某一類方塊，呢個例子係所有顏色羊毛。`],
+  [`#clipboard`,`用剪貼簿嘅內容做花紋。`],
+  [`hand`,`用你手上揸住嗰種方塊。`],
+  [`!air`,`揀方塊時用：所有唔係空氣嘅方塊。`],
+  [`#existing`,`揀方塊時用：所有已存在嘅方塊。`],
+  [`##leaves`,`揀方塊時用：某一類方塊，呢個例子係所有樹葉。`],
+  [`>grass_block`,`揀方塊時用：草方塊對上嗰一格。例如 //replace >grass_block air 清走草地面嘅草同花。`],
+  [`/searchitem -b brick`,`用關鍵字搵方塊 id。`],
+  [`/kubejs hand`,`睇你手上物品嘅 id，搵模組方塊好用。`],
+ ]},
+ ]},
+{id:'blocks', nav:'方塊名', title:'常用方塊名', intro:'撳一下就複製 id。全部都係 1.20.1 有嘅方塊。打指令時撳 Tab 亦會自動補完。', blocks:true},
+{id:'flan', nav:'領地', title:'領地（Flan）', intro:'領地入面，冇權限嘅人唔可以打爛或者放方塊。呢個 server 只可以喺主世界圈地。',
+ groups:[
+ {t:'圈地同睇資料', items:[
+  [`金鋤頭右鍵兩個對角`,`圈一塊領地。揸住金鋤頭會顯示你剩低幾多格數。最細要 100 格面積，每人最多 5 塊。`],
+  [`金鋤頭右鍵領地嘅角，再右鍵新位置`,`改領地大細。`],
+  [`木棍右鍵方塊`,`查呢格屬於邊塊領地。`],
+  [`/flan add 3400 60 6300 3500 60 6400`,`用座標圈地，唔使行去兩個角。`],
+  [`/flan add rect 120 120`,`以你為中心圈一塊 120×120 嘅長方形。`],
+  [`/flan expand 10`,`將你身處嘅領地擴大 10 格。`,'u'],
+  [`/flan info`,`睇你企緊呢塊領地嘅資料。`],
+  [`/flan list`,`列出你所有領地。/flan list 玩家名 可以睇其他人嘅。`],
+  [`/flan name 新手村`,`幫領地改名。`],
+  [`/flan claimMessage enter title string 歡迎嚟到新手村`,`設定有人行入領地時彈出嘅標題。enter 可以換 leave，title 可以換 subtitle。`,'u'],
+  [`/flan setHome`,`將你企嘅位置設做呢塊領地嘅傳送點。`],
+  [`/flan trapped`,`困咗喺人哋領地時，5 秒後傳送你出去。`],
+  [`/flan help`,`睇全部領地指令。/flan help cmd 指令名 睇單一條。`],
+ ]},
+ {t:'權限：訪客可以做咩', p:'「global」係對所有冇入組嘅人生效。最後可以寫 true（准）、false（唔准）、default。權限名打到一半撳 Tab 會補完。', items:[
+  [`/flan menu`,`企喺領地入面打，開圖形選單改權限、群組、成員。唔想記指令就用呢個。`],
+  [`/flan permission global flan:break false`,`所有訪客唔可以打爛方塊。`],
+  [`/flan permission global flan:place false`,`所有訪客唔可以放方塊。`],
+  [`/flan permission global flan:interact_block true`,`訪客可以用功能方塊（按掣以外嘅一般互動）。`],
+  [`/flan permission global flan:open_container false`,`訪客唔可以開箱、熔爐呢類容器。`],
+  [`/flan permission global flan:mob_spawn false`,`領地入面唔生敵對怪。`],
+  [`/flan permission group Member flan:break true`,`某個群組另外設定，呢個例子係 Member 組可以打爛方塊。`],
+ ]},
+ {t:'群組同成員', p:'預設有 Visitor、Member、Co-Owner、Admin、Banned 幾個群組樣板。', items:[
+  [`/flan group add 建築隊`,`喺呢塊領地開一個群組。`],
+  [`/flan group players add 建築隊 玩家名`,`將玩家加入群組。佢已經喺第二組就要喺最後加 overwrite。`],
+  [`/flan group players remove 建築隊 玩家名`,`將玩家移出群組。`],
+  [`/flan group remove 建築隊`,`刪除群組。`],
+  [`/flan transferClaim 玩家名`,`將領地送畀另一個玩家。`],
+ ]},
+ {t:'子領地同例外', items:[
+  [`/flan switchMode SUBCLAIM`,`切換到子領地模式，之後用金鋤頭喺領地入面再圈一小塊，可以有自己一套權限（例如公共倉庫）。改子領地權限都要喺呢個模式。`,'u'],
+  [`/flan deleteSubClaim`,`刪除你企緊嘅子領地。`],
+  [`/flan ignoreList add block_use minecraft:anvil`,`呢塊領地入面，指定方塊任何人都用得。block_use 可以換 block_break、block_place、item、entity_attack、entity_use。`,'u'],
+ ]},
+ {t:'管理員專用（得你用得）', items:[
+  [`/flan setAdminClaim true`,`將你企緊嘅領地變做管理員領地：唔屬於任何玩家、唔佔格數、只有管理員改得。打 false 變返普通領地並歸你。`],
+  [`/flan listAdminClaims`,`列出呢個世界所有管理員領地。`],
+  [`/flan giveClaimBlocks R1suuu 30000`,`畀玩家額外領地格數。`],
+  [`/flan list 玩家名`,`睇某個玩家有邊啲領地。`],
+  [`/flan bypass`,`開關「無視領地」模式：開咗之後你喺任何人嘅領地都可以起同拆。`,'u'],
+  [`/flan delete`,`刪除你企緊嘅領地（方塊唔會消失，只係冇咗保護）。`,'w'],
+  [`/flan adminDelete`,`強制刪除你企緊嘅領地，唔理係邊個嘅。`,'w'],
+  [`/flan adminDelete all 玩家名`,`刪晒某個玩家所有領地。`,'d'],
+  [`/flan deleteAll`,`刪晒你自己所有領地，要打兩次確認。`,'d'],
+ ]},
+ ],
+ after:'flanTable'},
+{id:'mobs', nav:'生怪', title:'生怪控制', intro:'分清楚「成個範圍唔生怪」同「喺固定位置放指定嘅怪」。',
+ groups:[
+ {t:'成個範圍唔生敵對怪', items:[
+  [`/flan permission global flan:mob_spawn false`,`領地入面唔會自然生成敵對怪。普通領地本身已經鎖死做 false；管理員領地唔跟呢個鎖，要自己打一次。刷怪籠同指令生嘅怪擋唔擋，未試過。`,'u'],
+  [`/give @s torchmaster:megatorch`,`超級火把：放低之後，半徑 64 格內唔會自然生成敵對怪。指令生嘅怪唔受影響。唔使領地都用得。`,'u'],
+  [`/give @s torchmaster:dreadlamp`,`恐懼之燈：半徑 64 格內唔會自然生成動物。`,'u'],
+  [`交畀 Claude：In Control 區域`,`最徹底：連刷怪籠同指令生嘅敵對怪都擋，主城就係用呢個。將新村座標範圍畀 Claude 加入設定。`],
+ ]},
+ {t:'喺固定位置放指定嘅怪或者 NPC', p:'主城範圍內，任何敵對怪一出現就會被 In Control 清走，要放就先同 Claude 講開例外。', items:[
+  [`/summon minecraft:iron_golem ~ ~ ~ {NoAI:1b,PersistenceRequired:1b}`,`喺你企嘅位置放一隻唔識郁、唔會消失嘅鐵巨人，做守衛擺設。`,'u'],
+  [`/summon minecraft:zombie ~ ~ ~ {NoAI:1b,PersistenceRequired:1b,Silent:1b,CustomName:'{"text":"訓練假人"}',CustomNameVisible:1b}`,`放一隻唔識郁、冇聲、有名嘅殭屍做靶。殭屍曬到太陽會燒死，要放喺有屋頂嘅地方。俾人打死咗唔會重生。`,'u'],
+  [`/summon minecraft:villager ~ ~ ~ {NoAI:1b,PersistenceRequired:1b,Invulnerable:1b,CustomName:'{"text":"村長"}'}`,`放一個企定定、打唔死嘅村民。`,'u'],
+  [`Rotation:[90f,0f]`,`加喺大括號入面，決定佢面向邊度：0 向南、90 向西、180 向北、270 向東。`,'u'],
+  [`交畀 Claude：固定位置自動重生`,`想某個位置不停重生指定嘅怪（例如訓練場），用刷怪籠唔得，因為佢 1 分鐘後會自毀。要用 server 設定做，同 Claude 講位置、怪種、數量。`],
+ ]},
+ {t:'清走現有嘅怪', items:[
+  [`/butcher 30`,`殺死附近 30 格嘅敵對怪，唔會殺村民同動物。`],
+  [`/kill @e[type=minecraft:zombie,distance=..30]`,`殺死附近 30 格內指定種類嘅生物。`],
+  [`/kill @e[type=minecraft:item,distance=..20]`,`清走附近 20 格嘅掉落物。`],
+  [`/kill @e`,`殺死世界上所有嘢，包括村民、寵物、盔甲座、畫。千祈唔好打。`,'d'],
+ ]},
+ ]},
+{id:'other', nav:'其他指令', title:'其他常用指令', intro:'原版同其他模組嘅指令。~ 代表你而家嘅位置，例如 ~ ~5 ~ 即係你頭頂 5 格。@s 係你自己，@a 係所有玩家。',
+ groups:[
+ {t:'自己嘅狀態', items:[
+  [`/gamemode creative`,`創造模式。可以換 survival、spectator（旁觀，穿牆睇結構好用）。`],
+  [`/tp 3488 78 6460`,`傳送去座標。`],
+  [`/tp 玩家名`,`傳送去某個玩家身邊。`],
+  [`/tp 玩家名 R1suuu`,`將某個玩家傳送嚟你度。`],
+  [`/effect give @s minecraft:night_vision infinite 0 true`,`永久夜視，起室內同洞穴唔使插火把。`],
+  [`/effect clear @s`,`清走身上所有效果。`],
+  [`/give @s minecraft:golden_hoe`,`攞物品。常用：golden_hoe 圈地、stick 查領地、barrier 隱形牆、light 隱形光源。`],
+ ]},
+ {t:'時間同天氣', p:'全 server 一齊生效，其他玩家都會受影響。', items:[
+  [`/time set day`,`轉做朝早。可以換 noon、night、midnight。`],
+  [`/weather clear`,`放晴。`],
+  [`/gamerule doDaylightCycle false`,`停住時間。起完記得打返 true。`,'w'],
+  [`/gamerule doWeatherCycle false`,`停住天氣變化。`,'w'],
+ ]},
+ {t:'原版改方塊', p:'冇 //undo 可以還原。/fill 同 /clone 一次最多 32,768 格。大範圍用 WorldEdit。', items:[
+  [`/setblock ~ ~ ~ minecraft:lantern`,`喺你企嘅位置放一格。`],
+  [`/fill ~-5 ~-1 ~-5 ~5 ~-1 ~5 minecraft:stone_bricks`,`將兩個座標之間填滿。呢個例子係你腳下 11×11 嘅地板。`],
+  [`/fill ~-5 ~ ~-5 ~5 ~4 ~5 minecraft:oak_planks hollow`,`起一個空心盒，入面清空。outline 係只起外殼、入面唔郁。`],
+  [`/clone 100 64 100 110 70 110 200 64 200`,`將頭兩個座標之間嘅嘢複製去第三個座標。`],
+  [`/data get block ~ ~-1 ~`,`睇你腳下方塊嘅資料。`],
+ ]},
+ {t:'出生點', items:[
+  [`/setworldspawn`,`將世界出生點改做你企嘅位置。新玩家同冇床嘅人會喺呢度重生。搬新手村先用，而且主城功能要一齊搬。`,'w'],
+  [`/spawnpoint 玩家名`,`將某個玩家嘅個人重生點設做你企嘅位置。`],
+ ]},
+ {t:'睇資料', items:[
+  [`F3`,`除錯畫面：左邊有你嘅座標，右邊 Targeted Block 係你望住嗰格嘅 id。`],
+  [`F3 + G`,`顯示區塊邊界。`],
+  [`/locate structure minecraft:village_plains`,`搵最近嘅指定結構。`],
+  [`/locate biome minecraft:cherry_grove`,`搵最近嘅指定生態域。`],
+  [`/gamerule keepInventory`,`唔寫數值就係睇而家設定。呢個 server：keepInventory true、mobGriefing true、doFireTick false。`],
+ ]},
+ {t:'千祈唔好用', items:[
+  [`/reload`,`會整壞呢個 server 嘅地城模組（Library of Exile），要重啟先救得返。`,'d'],
+  [`/gamerule doMobSpawning false`,`成個世界所有地方都唔再生怪，唔止新手村。`,'d'],
+  [`/difficulty peaceful`,`成個世界嘅敵對怪即刻消失，包括地城同世界 Boss。`,'d'],
+  [`/stop`,`閂 server。要重啟就同 Claude 講，或者用 Discord 控制台。`,'d'],
+ ]},
+ ]},
+];
+
+const FLAN_PERMS = [
+ ['flan:break','打爛方塊','false',''],
+ ['flan:place','放方塊','false',''],
+ ['flan:interact_block','用功能方塊（一般互動）','true','唔開嘅話，訪客連工作站都用唔到'],
+ ['flan:open_container','開箱、熔爐等容器','false','有公共箱先開，或者用子領地'],
+ ['flan:button_lever','撳掣、拉桿','true',''],
+ ['flan:pressure_plate','踩壓力板','true',''],
+ ['flan:door','開門','true','普通領地鎖死 true；管理員領地要自己設'],
+ ['flan:trapdoor','開地板門','true','普通領地鎖死 true；管理員領地要自己設'],
+ ['flan:fence_gate','開柵欄門','true','普通領地鎖死 true；管理員領地要自己設'],
+ ['flan:bed','瞓床','true',''],
+ ['flan:anvil','用鐵砧','true',''],
+ ['flan:enchantment','用附魔台','true',''],
+ ['flan:trading','同村民交易','true',''],
+ ['flan:portal','用地獄門','true',''],
+ ['flan:bucket','用水桶','false',''],
+ ['flan:trample','踩爛農田','false',''],
+ ['flan:hurt_animal','打動物','false',''],
+ ['flan:animal_interact','同動物互動（剪毛等）','false',''],
+ ['flan:armorstand','郁盔甲座','false',''],
+ ['flan:itemframe_rotate','轉展示框','false',''],
+ ['flan:interact_sign','改告示牌','false',''],
+ ['flan:redstone','改紅石元件','false',''],
+ ['flan:hurt_player','打其他玩家（PvP）','false',''],
+ ['flan:mob_spawn','生敵對怪','false','管理員領地要自己設'],
+ ['flan:animal_spawn','生其他生物（動物）','睇你想唔想有動物',''],
+ ['flan:explosions','爆炸','false',''],
+ ['flan:fire_spread','火蔓延','false',''],
+ ['flan:wither','凋零怪破壞方塊','false',''],
+ ['flan:enderman','終界使者搬方塊','false',''],
+ ['flan:lightning','閃電影響領地','false',''],
+ ['flan:water_border','水流過領地邊界','false',''],
+ ['flan:piston_border','活塞推拉過邊界','false',''],
+ ['flan:raid','觸發突襲','false',''],
+ ['flan:pickup','執嘢','true',''],
+ ['flan:drop','掟嘢','true',''],
+ ['flan:can_stay','可以留喺領地','true','false 即係唔畀入'],
+ ['flan:flight','非創造模式飛行','true','普通領地鎖死 true；管理員領地要自己設'],
+];
+
+const WOODS = '木種：oak 橡木、spruce 杉木、birch 樺木、jungle 叢林木、acacia 相思木、dark_oak 黑橡木、mangrove 紅樹林木、cherry 櫻花木。竹同地獄木有少少唔同：bamboo_planks、bamboo_block、crimson_planks、crimson_stem、warped_planks、warped_stem。';
+const COLOURS = '顏色：white 白、light_gray 淺灰、gray 灰、black 黑、brown 啡、red 紅、orange 橙、yellow 黃、lime 淺綠、green 綠、cyan 青、light_blue 淺藍、blue 藍、purple 紫、magenta 洋紅、pink 粉紅。';
+const BLOCKS = [
+ {t:'石材', p:'樓梯加 _stairs、半磚加 _slab、牆加 _wall。名入面有 bricks 嘅要變單數：stone_brick_stairs、stone_brick_slab、stone_brick_wall。', items:[
+  ['石頭','stone'],['鵝卵石','cobblestone'],['青苔鵝卵石','mossy_cobblestone'],['石磚','stone_bricks'],['青苔石磚','mossy_stone_bricks'],['裂紋石磚','cracked_stone_bricks'],['浮雕石磚','chiseled_stone_bricks'],['平滑石頭','smooth_stone'],
+  ['安山岩','andesite'],['磨製安山岩','polished_andesite'],['閃長岩','diorite'],['磨製閃長岩','polished_diorite'],['花崗岩','granite'],['磨製花崗岩','polished_granite'],
+  ['深板岩','deepslate'],['深板岩鵝卵石','cobbled_deepslate'],['磨製深板岩','polished_deepslate'],['深板岩磚','deepslate_bricks'],['深板岩瓦','deepslate_tiles'],['凝灰岩','tuff'],['方解石','calcite'],
+  ['紅磚','bricks'],['泥磚','mud_bricks'],['砂岩','sandstone'],['平滑砂岩','smooth_sandstone'],['切製砂岩','cut_sandstone'],
+  ['石英方塊','quartz_block'],['石英磚','quartz_bricks'],['石英柱','quartz_pillar'],['黑石','blackstone'],['磨製黑石磚','polished_blackstone_bricks'],['玄武岩','basalt'],['平滑玄武岩','smooth_basalt'],
+  ['海磷石磚','prismarine_bricks'],['黑曜石','obsidian'],['地獄磚','nether_bricks'],['終界石磚','end_stone_bricks'],
+ ]},
+ {t:'木材（橡木做例子）', p:WOODS, items:[
+  ['橡木材','oak_planks'],['橡木原木','oak_log'],['剝皮橡木原木','stripped_oak_log'],['橡木塊（六面樹皮）','oak_wood'],['橡木樓梯','oak_stairs'],['橡木半磚','oak_slab'],
+  ['橡木柵欄','oak_fence'],['橡木柵欄門','oak_fence_gate'],['橡木門','oak_door'],['橡木地板門','oak_trapdoor'],['橡木樹葉','oak_leaves'],['橡木告示牌','oak_sign'],
+ ]},
+ {t:'地面同自然', items:[
+  ['草方塊','grass_block'],['泥土','dirt'],['砂土（唔生草）','coarse_dirt'],['灰化土','podzol'],['土徑（村路）','dirt_path'],['耕地','farmland'],['泥巴','mud'],['夯實泥巴','packed_mud'],
+  ['沙','sand'],['紅沙','red_sand'],['礫石','gravel'],['黏土','clay'],['雪塊','snow_block'],['雪（薄層）','snow'],['冰','ice'],['冰磚','packed_ice'],
+  ['青苔塊','moss_block'],['青苔地毯','moss_carpet'],['水','water'],['熔岩','lava'],['矮草','grass'],['高草','tall_grass'],['蕨','fern'],['藤蔓','vine'],['蓮葉','lily_pad'],
+  ['乾草捆','hay_block'],['南瓜','pumpkin'],['西瓜','melon'],
+ ]},
+ {t:'花', items:[
+  ['蒲公英','dandelion'],['罌粟','poppy'],['藍色蝴蝶蘭','blue_orchid'],['紫紅球花','allium'],['雛草','azure_bluet'],['紅色鬱金香','red_tulip'],['雛菊','oxeye_daisy'],['矢車菊','cornflower'],
+  ['鈴蘭','lily_of_the_valley'],['向日葵','sunflower'],['紫丁香','lilac'],['玫瑰叢','rose_bush'],['牡丹','peony'],['粉紅花瓣','pink_petals'],
+ ]},
+ {t:'玻璃同光源', items:[
+  ['玻璃','glass'],['玻璃片','glass_pane'],['火把','torch'],['燈籠','lantern'],['靈魂燈籠','soul_lantern'],['螢石','glowstone'],['海燈籠','sea_lantern'],['菇光體','shroomlight'],
+  ['紅石燈','redstone_lamp'],['終界燭','end_rod'],['營火','campfire'],['蠟燭','candle'],['南瓜燈','jack_o_lantern'],['隱形光源','light[level=15]'],
+ ]},
+ {t:'顏色方塊（白色做例子）', p:COLOURS, items:[
+  ['羊毛','white_wool'],['地毯','white_carpet'],['混凝土','white_concrete'],['陶瓦','white_terracotta'],['冇染色陶瓦','terracotta'],['染色玻璃','white_stained_glass'],['染色玻璃片','white_stained_glass_pane'],['床','white_bed'],
+ ]},
+ {t:'裝飾同功能', items:[
+  ['書架','bookshelf'],['工作台','crafting_table'],['熔爐','furnace'],['木桶','barrel'],['儲物箱','chest'],['鐵砧','anvil'],['附魔台','enchanting_table'],['講台','lectern'],['鐘','bell'],
+  ['鍋釜','cauldron'],['堆肥桶','composter'],['織布機','loom'],['切石機','stonecutter'],['砂輪','grindstone'],['鍛造台','smithing_table'],['釀造台','brewing_stand'],['花盆','flower_pot'],
+  ['鐵柵欄','iron_bars'],['鎖鏈','chain'],['梯','ladder'],['鷹架','scaffolding'],['蜘蛛網','cobweb'],['飾紋陶罐','decorated_pot'],
+ ]},
+ {t:'金屬同礦物', items:[
+  ['鐵方塊','iron_block'],['金方塊','gold_block'],['銅方塊','copper_block'],['切製銅','cut_copper'],['氧化銅','oxidized_copper'],['綠寶石方塊','emerald_block'],['鑽石方塊','diamond_block'],
+  ['青金石方塊','lapis_block'],['紅石方塊','redstone_block'],['煤炭方塊','coal_block'],['紫水晶方塊','amethyst_block'],
+ ]},
+ {t:'特別用途', items:[
+  ['空氣（清空）','air'],['屏障（隱形牆）','barrier'],['基岩','bedrock'],['黏液塊','slime_block'],['蜂蜜塊','honey_block'],['超級火把','torchmaster:megatorch'],
+ ]},
+];
+
+const TAGS = {u:['u','未實測'], w:['w','小心'], d:['d','危險']};
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const main = document.getElementById('main');
+
+function row(item) {
+  const r = el('div', 'row');
+  const b = el('button', 'c', item[0]); b.type = 'button';
+  const d = el('div', 'd', item[1]);
+  for (const f of (item[2] || '')) { const t = TAGS[f]; if (t) d.appendChild(el('span', 'tag ' + t[0], t[1])); }
+  r.append(b, d);
+  return r;
+}
+function flanTable() {
+  const g = el('div', 'group');
+  g.appendChild(el('h3', null, '常用權限一覽（新手村建議值）'));
+  g.appendChild(el('p', null, '用法：/flan permission global 權限名 true 或 false。撳權限名可以複製。普通領地入面，server 鎖死咗門、地板門同柵欄門一定開得；管理員領地唔跟呢個鎖，要自己設 true。傳送石、Lootr 寶箱、工作台就任何領地都用得。'));
+  const w = el('div', 'tablewrap'), t = el('table');
+  const h = el('tr'); ['權限名', '管咩', '建議', '備註'].forEach(x => h.appendChild(el('th', null, x))); t.appendChild(h);
+  for (const p of FLAN_PERMS) {
+    const tr = el('tr'); tr.className = 'prow';
+    const td = el('td'); const b = el('button', 'c', p[0]); b.type = 'button'; td.appendChild(b); tr.appendChild(td);
+    tr.appendChild(el('td', null, p[1]));
+    const v = el('td', p[2] === 'true' ? 'yes' : p[2] === 'false' ? 'no' : null, p[2]); tr.appendChild(v);
+    tr.appendChild(el('td', null, p[3]));
+    t.appendChild(tr);
+  }
+  w.appendChild(t); g.appendChild(w);
+  return g;
+}
+for (const s of SECTIONS) {
+  const sec = el('section'); sec.id = s.id; sec.dataset.nav = s.nav;
+  sec.appendChild(el('h2', null, s.title));
+  sec.appendChild(el('p', 'intro', s.intro));
+  if (s.blocks) {
+    for (const g of BLOCKS) {
+      const box = el('div', 'group');
+      box.appendChild(el('h3', null, g.t));
+      if (g.p) box.appendChild(el('p', null, g.p));
+      const grid = el('div', 'blocks');
+      for (const [zh, id] of g.items) {
+        const b = el('button', 'blk'); b.type = 'button'; b.dataset.copy = id;
+        b.append(el('b', null, zh), el('code', null, id));
+        grid.appendChild(b);
+      }
+      box.appendChild(grid); sec.appendChild(box);
+    }
+  }
+  for (const g of (s.groups || [])) {
+    const box = el('div', 'group');
+    box.appendChild(el('h3', null, g.t));
+    if (g.p) box.appendChild(el('p', null, g.p));
+    g.items.forEach(i => box.appendChild(row(i)));
+    sec.appendChild(box);
+  }
+  if (s.after === 'flanTable') sec.appendChild(flanTable());
+  main.appendChild(sec);
+}
+// put the status section last, the quick start first
+main.appendChild(document.getElementById('guard'));
+
+const nav = document.getElementById('nav');
+for (const s of main.querySelectorAll('section')) {
+  const a = el('a', null, s.dataset.nav); a.href = '#' + s.id; nav.appendChild(a);
+}
+
+// copy on click
+const toast = document.getElementById('toast'); let tt = 0;
+function say(msg) { toast.textContent = msg; toast.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove('on'), 1400); }
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+  try {
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok;
+  } catch (e) { return false; }
+}
+document.addEventListener('click', async ev => {
+  const b = ev.target.closest('.c, .blk'); if (!b) return;
+  const text = b.dataset.copy || b.textContent;
+  const ok = await copy(text);
+  say(ok ? '已複製：' + text : '複製唔到，請手動揀字');
+  b.classList.add('done'); setTimeout(() => b.classList.remove('done'), 900);
+});
+
+// search
+const q = document.getElementById('q'), hits = document.getElementById('hits');
+const units = [...main.querySelectorAll('.row, .blk, .prow, .card, .facts li, .note')];
+units.forEach(u => { u.dataset.s = u.textContent.toLowerCase(); });
+function filter() {
+  const words = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  let n = 0;
+  for (const u of units) {
+    const show = words.every(w => u.dataset.s.includes(w));
+    u.hidden = !show; if (show) n++;
+  }
+  for (const g of main.querySelectorAll('.group, .cards')) g.hidden = !g.querySelector('.row:not([hidden]), .blk:not([hidden]), .prow:not([hidden]), .card:not([hidden]), .facts li:not([hidden]), .note:not([hidden])');
+  for (const s of main.querySelectorAll('section')) s.hidden = !s.querySelector('.group:not([hidden]), .cards:not([hidden])');
+  hits.textContent = words.length ? (n + ' 項') : '';
+}
+q.addEventListener('input', filter);
+document.addEventListener('keydown', ev => {
+  if (ev.key === '/' && document.activeElement !== q) { ev.preventDefault(); q.focus(); q.select(); }
+  else if (ev.key === 'Escape' && document.activeElement === q) { q.value = ''; filter(); q.blur(); }
+});
+</script>
+</body>
+</html>
